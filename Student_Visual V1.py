@@ -9,6 +9,8 @@ import plotly.express as px
 import openpyxl
 import base64
 import  io
+from plotly.subplots import make_subplots
+import plotly.graph_objs as go
 
 # Making the head
 st.set_page_config(page_title=' Performance Tracker V1')
@@ -56,20 +58,68 @@ if selection:
      st.write(f" {studentname} performance in selected subjects ")
      student_performance = selectedroll[selection].T
      student_performance.columns = ['Marks']
+
+     student_performance['Marks'] = student_performance['Marks'].astype(float)
+
+     # Create a combined bar and line chart using Plotly
      student_performance['Subjects'] = student_performance.index
 
- # Create a bar chart using Plotly
-     fig = px.bar(student_performance, x='Subjects', y='Marks',
-                  title='Student Performance in Selected Subjects',
-                  labels={'Marks': 'Marks', 'Subjects': 'Subjects'}, color='Subjects',
-                  color_discrete_sequence=['#ADD8E6', '#FA8072', '#FFD700', '#2E8B57', '#EE82EE'])
+     # Bar grpah colours
+     bar_colors = ['#ADD8E6', '#FA8072', '#FFD700', '#2E8B57', '#EE82EE']
+     markercolors = ['#FFFFFF', '#8B0000', '#FF8C00', '#008080', '#800080']
+
+     # Create subplots
+     fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+     # Add bar chart
+     fig.add_trace(
+         go.Bar(
+             x=student_performance['Subjects'],
+             y=student_performance['Marks'],
+             name='Marks',
+             marker_color=bar_colors,
+         ),
+         secondary_y=False,
+     )
+
+     # Add line chart
+     fig.add_trace(
+         go.Scatter(
+             x=student_performance['Subjects'],
+             y=student_performance['Marks'],
+             name=' Score marker',
+             mode='lines+markers',
+             line=dict(color='white'),
+             marker=dict(color=markercolors, size=10),  # Use the same colors as bars for consistency
+         ),
+         secondary_y=False,
+     )
+
+     fig.update_layout(
+         title_text=f" {studentname}'s performance Selected Subjects",
+         xaxis_title="Subjects",
+         yaxis_title="Marks",
+         yaxis=dict(range=[0,100]),
+         width=1500,
+         height=509,
+         showlegend=True,
+     )
      st.plotly_chart(fig)
+
      strongestsubject = student_performance['Marks'].idxmax()
      weakestsubject = student_performance['Marks'].idxmin()
 
-     st.subheader(' AI Generated Suggestions 🧠 ')
-     st.write(f"{studentname} needs to work more on {weakestsubject} ")
-     st.write(f"{studentname} scored highest in  {strongestsubject} ")
+     st.header(studentname+"'s Performance Analysis 🧠")
+     st.write(f"{studentname} needs to work more on {weakestsubject}")
+     st.write(f"{studentname} scored highest in {strongestsubject}")
+
+else:
+    st.warning(' Please select subjects to visualise')
+
+
+
+
+
 
 
 
