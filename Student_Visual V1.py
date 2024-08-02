@@ -55,6 +55,7 @@ selection = st.multiselect('Choose subjects to visualise',('English','Pol Sci','
 
 if selection:
      studentname = selectedroll['Name'].values[0]
+     splitname = studentname.split()[0]
      st.write(f" {studentname} performance in selected subjects ")
      student_performance = selectedroll[selection].T
      student_performance.columns = ['Marks']
@@ -96,7 +97,7 @@ if selection:
      )
 
      fig.update_layout(
-         title_text=f" {studentname}'s performance Selected Subjects",
+         title_text=f" {studentname}'s performance in Selected Subjects",
          xaxis_title="Subjects",
          yaxis_title="Marks",
          yaxis=dict(range=[0,100]),
@@ -109,12 +110,25 @@ if selection:
      strongestsubject = student_performance['Marks'].idxmax()
      weakestsubject = student_performance['Marks'].idxmin()
 
-     st.header(studentname+"'s Performance Analysis 🧠")
-     st.write(f"{studentname} needs to work more on {weakestsubject}")
-     st.write(f"{studentname} scored highest in {strongestsubject}")
+     st.header(splitname+"'s Performance Analysis 🧠")
+     st.subheader(" Strenght's 💪")
+     st.write(f"{splitname} scored highest in {strongestsubject}")
+     st.subheader(" Cons 📉")
+     st.write(f"{splitname} needs to work more on {weakestsubject}")
 
+    # Calculating percentage
+     Total = student_performance['Marks'].sum()
+     percentage = Total/500*100
+     st.subheader(f"{splitname}'s percentage is {percentage}")
+     if percentage>=90:
+         st.write(f' Excellent job {splitname} keep it up')
+     elif 85>percentage>79:
+         st.write(f' Good Work {splitname} next time target for {percentage+20}%')
+     else:
+        st.write(f'Keep Working Hard {splitname}')
 else:
     st.warning(' Please select subjects to visualise')
+
 
 
 
